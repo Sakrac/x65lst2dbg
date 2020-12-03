@@ -6,6 +6,16 @@
 #define STRUSE_IMPLEMENTATION
 #include "struse/struse.h"
 
+#ifndef _MSC_VER
+#define fopen_s(f, n, t) ((*f = fopen(n,t)) == nullptr ? 1 : 0)
+#endif
+
+#ifndef _WIND32
+#include <linux/limits.h>
+#define _MAX_PATH PATH_MAX
+#endif
+
+
 void* LoadBinary(const char* filename, size_t& size)
 {
 	FILE* f;
@@ -36,10 +46,14 @@ struct SectionFileRef {
 	size_t end;
 };
 
+class FileRefSections : public std::vector<SectionFileRef> {
+
+};
+
 struct SectionFileList {
 	strref name;
 	size_t start, end;
-	std::vector<SectionFileRef>* files;
+	FileRefSections* files;
 };
 
 struct ListObjectAlias {
@@ -50,7 +64,7 @@ struct ListObjectAlias {
 std::vector<Section> aSections;
 std::vector<SectionFileList> aSectionFileLists;
 std::vector<ListObjectAlias> aListObjectAliases;
-std::vector<void*> aLoaded;
+std::vector<char*> aLoaded;
 
 
 bool ProcessSection(strref& parseOrig, size_t start, strovl& out)
@@ -81,7 +95,7 @@ bool ProcessListing(strref file, strref objFile, strref linkpath, strovl& out)
 	filename_local.cleanup_path();
 
 	if (void* file = LoadBinary(filename_local.c_str(), size)) {
-		aLoaded.push_back(file);
+		aLoaded.push_back((char*)file);
 		strref parse((const char*)file, strl_t(size));
 		while (strref line = parse.next_line()) {
 			if (line.grab_prefix("Section")) {
@@ -211,7 +225,7 @@ bool LoadSectionListing(const char* filename)
 {
 	size_t size;
 	if (void* file = LoadBinary(filename, size)) {
-		aLoaded.push_back(file);
+		aLoaded.push_back((char*)file);
 		strref parse((const char*)file, strl_t(size));
 		while (strref line = parse.next_line()) {
 			if (line.grab_prefix("Section ")) {
@@ -227,7 +241,8 @@ bool LoadSectionListing(const char* filename)
 							line.skip_whitespace();
 							if (line.grab_char('$')) {
 								size_t end = line.ahextoui_skip();
-								SectionFileList fileList = { name, start, end, new std::vector<SectionFileRef>() };
+								FileRefSections *sections = new FileRefSections(); 
+								SectionFileList fileList = { name, start, end, sections };
 								aSectionFileLists.push_back(fileList);
 								LoadFileListFromSection(parse, aSectionFileLists[aSectionFileLists.size() - 1]);
 							}
@@ -268,7 +283,7 @@ bool LoadLstObjFiles(const char* filename)
 {
 	size_t size;
 	if (void* file = LoadBinary(filename, size)) {
-		aLoaded.push_back(file);
+		aLoaded.push_back((char*)file);
 		strref parse((const char*)file, strl_t(size));
 		while (strref line = parse.next_line()) {
 			strref a = line.split_token('=');
