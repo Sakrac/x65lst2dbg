@@ -10,7 +10,7 @@
 #define fopen_s(f, n, t) ((*f = fopen(n,t)) == nullptr ? 1 : 0)
 #endif
 
-#ifndef _WIND32
+#ifndef _WIN32
 #include <linux/limits.h>
 #define _MAX_PATH PATH_MAX
 #endif
