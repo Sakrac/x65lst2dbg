@@ -167,7 +167,7 @@ bool MergeListingFiles(const char* linkFile, const char* outName)
 				processedFiles.push_back(ref.filename);
 
 				for (size_t l = 0, nl = aListObjectAliases.size(); l < nl; ++l) {
-					if (fileLocal.same_str(aListObjectAliases[l].object)) {
+					if (fileLocal.same_str(aListObjectAliases[l].object, '/', '\\')) {
 						ProcessListing(aListObjectAliases[l].listing, fileLocal.get_strref(), linkPath, out);
 						break;
 					}

@@ -705,7 +705,7 @@ public:
 	unsigned int fnv1a_append(unsigned int base_fnv1a_hash) const { return get_strref().fnv1a(base_fnv1a_hash); }
 
 	// whole string compare
-	bool same_str(const strref str) const { return get_strref().same_str_case(str); }
+	bool same_str(const strref str) const { return get_strref().same_str(str); }
 	bool same_str_case(const strref str) const { return get_strref().same_str_case(str); }
 	bool same_str(const strref str, char same1, char same2) const {
 		return get_strref().same_str_case(str, same1, same2); }
