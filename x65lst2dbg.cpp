@@ -179,6 +179,8 @@ bool MergeListingFiles(const char* linkFile, const char* outName)
 	if (fopen_s(&f, outName, "wb") == 0 && f) {
 		fwrite(outFile, out.get_len(), 1, f);
 		fclose(f);
+	} else {
+		printf("Failed to open \"%s\" for export\n", outName);
 	}
 	free(outFile);
 
