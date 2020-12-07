@@ -10,7 +10,7 @@
 #define fopen_s(f, n, t) ((*f = fopen(n,t)) == nullptr ? 1 : 0)
 #endif
 
-#ifndef _WIN32
+#ifdef __linux__
 #include <linux/limits.h>
 #define _MAX_PATH PATH_MAX
 #endif
@@ -65,7 +65,6 @@ std::vector<Section> aSections;
 std::vector<SectionFileList> aSectionFileLists;
 std::vector<ListObjectAlias> aListObjectAliases;
 std::vector<char*> aLoaded;
-
 
 bool ProcessSection(strref& parseOrig, size_t start, strovl& out)
 {

@@ -927,7 +927,7 @@ public:
 	}
 
 	// c style sprintf (work around windows _s preference)
-#ifdef WIN32
+#ifdef _MSC_VER
 	int sprintf(const char *format, ...) { va_list args; va_start(args, format);
 		set_len_int((strl_t)vsnprintf_s(charstr(), cap(), _TRUNCATE, format, args)); va_end(args); return (int)len(); }
 	int sprintf_at(strl_t pos, const char *format, ...) { va_list args; va_start(args, format);
